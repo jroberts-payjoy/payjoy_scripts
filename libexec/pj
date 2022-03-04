@@ -56,7 +56,7 @@ if [[ "$uc" = "0" ]]; then
 
   githash=`git log --pretty=format:'%h' -n 1`
 
-  echo -n "[$githash] Checking for updates...  "
+  echo -n "Checking for updates, Current Hash [$githash]...  "
 
   uc=`expr $uc + 1`
 
