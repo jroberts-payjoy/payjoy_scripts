@@ -44,7 +44,7 @@ curversion=`cat $SCRIPT_DIR/../tmp/.available_version`
 
 rm -rf $SCRIPT_DIR/../tmp/.available_version
 
-if [[ "$curversion" != "$availversion" ]]; then
+if [[ "$curversion" -gt "$availversion" ]]; then
 
   echo $curversion > $SCRIPT_DIR/../tmp/.version
 
