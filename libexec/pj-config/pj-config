@@ -1,4 +1,5 @@
 #!/usr/bin/env php
+
 <?php
 # Usage: pj config
 # Summary: Accesses config variables
@@ -52,3 +53,5 @@ function get_config_by_params($params)
 
 	return $return;
 }
+
+
