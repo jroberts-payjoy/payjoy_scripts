@@ -8,7 +8,7 @@ For Auto Update to work, You need wget installed
 
 Place the following line, Modified with the correct path, in your .zshrc or .bashrc file in your user home directory
 
-    eval "$(/Users/jeffrey.roberts/Projects/payjoy_scripts/bin/pj init -)"
+    eval "$(/Users/jeffrey.roberts/Projects/payjoy_scripts/bin/pj init -)" 
 
 # Example Commands
 
