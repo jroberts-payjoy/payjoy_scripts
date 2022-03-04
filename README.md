@@ -10,14 +10,19 @@ Place the following line, Modified with the correct path, in your .zshrc or .bas
 
     eval "$(/Users/jeffrey.roberts/Projects/payjoy_scripts/bin/pj init -)" 
  
-# Example Commands
+# Adding commands
 
-% pj test run 
-- Runs all php unit tests 
+    git checkout -b new-simple-command
+    touch libexec/pj-simple
+    chmod +x libexec/pj-simple
+    echo "#!/usr/bin/env bash" > libexec/pj-simple
+    git add libexec/pj-simple
+    git commit -m 'Simple Command'
+    pj scripts push
+    
+# Including Documentation
 
-% pj test create RevolvingCreditTestCase
-- Creates a skeleton test case
-
+    Please see below to add "Usage, Summary, and Help" comments to each of your commands
 
 # sub: a delicious way to organize programs
 
