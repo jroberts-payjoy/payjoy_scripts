@@ -46,8 +46,6 @@ rm -rf $SCRIPT_DIR/../../tmp/.available_version
 
 if [[ "$curversion" -gt "$availversion" ]]; then
 
-  echo $curversion > $SCRIPT_DIR/../../tmp/.version
-
   pj scripts update > /dev/null 2>&1
 
 fi
