@@ -15,7 +15,7 @@ echo $ver > $SCRIPT_DIR/../../.version
 
 cd $SCRIPT_DIR/../..
 
-git add tmp/.version
+git add .version
 
 git commit -m 'Incrementing Version'
 
