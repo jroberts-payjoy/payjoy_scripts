@@ -22,6 +22,18 @@ You could also install your sub in a different directory, say `/usr/local`. This
     git commit -m 'Simple Command'
     pj scripts push
     
+# Using YAML config files in conf/
+
+    Try executing "pj config servers production username"
+    
+    To store the results of that command into bash variable
+    
+    var=$(pj config servers production username)
+    
+# Want to use PHP instead of BASH?
+
+    Check out libexec/pj-config/pj-config
+    
 # Including Documentation
 
     Please see below under "Self-Documenting" to add "Usage, Summary, and Help" comments to each of your commands
