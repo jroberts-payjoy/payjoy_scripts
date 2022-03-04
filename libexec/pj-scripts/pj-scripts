@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Usage: pj scripts [command]
+# Summary: Scripts used to manage the payjoy_scripts repository
+# Help: These commands will allow you to update and push updates to the repository
+
+set -e
+
+pj help scripts
