@@ -1,6 +1,112 @@
 #!/usr/bin/env bash
 set -e
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+function __wget() {
+    : ${DEBUG:=0}
+    local URL=$1
+    local tag="Connection: close"
+    local mark=0
+
+    if [ -z "${URL}" ]; then
+        printf "Usage: %s \"URL\" [e.g.: %s http://www.google.com/]" \
+               "${FUNCNAME[0]}" "${FUNCNAME[0]}"
+        return 1;
+    fi
+    read proto server path <<<$(echo ${URL//// })
+    DOC=/${path// //}
+    HOST=${server//:*}
+    PORT=${server//*:}
+    [[ x"${HOST}" == x"${PORT}" ]] && PORT=80
+    [[ $DEBUG -eq 1 ]] && echo "HOST=$HOST"
+    [[ $DEBUG -eq 1 ]] && echo "PORT=$PORT"
+    [[ $DEBUG -eq 1 ]] && echo "DOC =$DOC"
+
+    exec 3<>/dev/tcp/${HOST}/$PORT
+    echo -en "GET ${DOC} HTTP/1.1\r\nHost: ${HOST}\r\n${tag}\r\n\r\n" >&3
+    while read line; do
+        [[ $mark -eq 1 ]] && echo $line
+        if [[ "${line}" =~ "${tag}" ]]; then
+            mark=1
+        fi
+    done <&3
+    exec 3>&-
+}
+
+echo
+echo "Launching PayJoy Script Handler"
+echo 
+
+if [[ -f "$SCRIPT_DIR/../tmp/.update_counter" ]]; then
+
+  uc=`cat $SCRIPT_DIR/../tmp/.update_counter`
+
+else 
+
+  uc="0"
+
+fi
+
+if [[ "$uc" = "0" ]]; then
+
+  cwwd=`echo $PWD`
+
+  cd $SCRIPT_DIR
+
+  githash=`git log --pretty=format:'%h' -n 1`
+
+  echo -n "[$githash] Checking for updates...  "
+
+  uc=`expr $uc + 1`
+
+  echo $uc > $SCRIPT_DIR/../tmp/.update_counter
+
+  wget https://github.com/jroberts-payjoy/payjoy_scripts -O $SCRIPT_DIR/../tmp/updatecheck.html > /dev/null 2>&1
+
+  # <a class="d-none js-permalink-shortcut" data-hotkey="y" href="/jroberts-payjoy/payjoy_scripts/tree/ac72ca6  
+  curhash=`cat $SCRIPT_DIR/../tmp/updatecheck.html | grep "js-permalink-shortcut" | cut -b 106,107,108,109,110,111,112`
+
+  echo -n "Available Hash [$curhash]..."
+
+  if [[ "$curhash" != "$githash" ]]; then
+
+    echo "Update FOUND! Updating..."
+
+    pj update > /dev/null 2>&1
+
+    newhash=`git log --pretty=format:'%h' -n 1`
+
+    echo ""
+    echo ""
+    echo "Updated to checkout hash: $newhash"
+    echo ""
+    echo ""
+
+  else
+
+    echo "No updates found."
+    echo ""
+
+  fi
+
+  cd $cwwd
+
+else
+
+  uc=`expr $uc + 1`
+
+  if [[ "$uc" == "5" ]]; then
+
+    uc="0"
+
+  fi
+
+  echo $uc > $SCRIPT_DIR/../tmp/.update_counter
+
+fi
+
+
 resolve_link() {
   $(type -p greadlink readlink | head -1) "$1"
 }
