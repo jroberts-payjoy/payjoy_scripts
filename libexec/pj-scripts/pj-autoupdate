@@ -1,6 +1,6 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
-set -e
+set -x
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -37,16 +37,16 @@ function __wget() {
 
 cwwd=`echo $PWD`
 
-wget https://raw.githubusercontent.com/jroberts-payjoy/payjoy_scripts/master/tmp/.version -O $SCRIPT_DIR/../tmp/.available_version > /dev/null 2>&1
+wget https://raw.githubusercontent.com/jroberts-payjoy/payjoy_scripts/master/tmp/.version -O $SCRIPT_DIR/../../tmp/.available_version > /dev/null 2>&1
 
-availversion=`cat $SCRIPT_DIR/../tmp/.version`
-curversion=`cat $SCRIPT_DIR/../tmp/.available_version`
+availversion=`cat $SCRIPT_DIR/../../tmp/.version`
+curversion=`cat $SCRIPT_DIR/../../tmp/.available_version`
 
-rm -rf $SCRIPT_DIR/../tmp/.available_version
+rm -rf $SCRIPT_DIR/../../tmp/.available_version
 
 if [[ "$curversion" -gt "$availversion" ]]; then
 
-  echo $curversion > $SCRIPT_DIR/../tmp/.version
+  echo $curversion > $SCRIPT_DIR/../../tmp/.version
 
   pj scripts update > /dev/null 2>&1
 
