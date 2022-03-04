@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Usage: pj scripts push
+# Summary: This script will push any changes currently commited to the payjoy_scripts github repo
+# Help: Please review the script itself before use
 
 set -e
 

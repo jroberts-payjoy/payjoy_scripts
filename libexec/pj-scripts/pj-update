@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Usage: pj scripts update
+# Summary: This script is called by the autoupdate script to update the local pj script repository
+# Help: Do not use this script manually
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
