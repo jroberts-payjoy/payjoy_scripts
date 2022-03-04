@@ -1,4 +1,4 @@
-# Requirements
+# Requirements 
 
 For Auto Update to work, You need wget installed
 
