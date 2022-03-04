@@ -1,16 +1,16 @@
 <?php
 
-define('_SUB_ROOT', getenv('_SUB_ROOT'));
+define('_PJ_ROOT', getenv('_PJ_ROOT'));
 
 // Grab required files for parsing YAML config
-require(_pj_ROOT .'/libexec/pj-config/lib/yaml-parser/Yaml.php');
-require(_pj_ROOT .'/libexec/pj-config/lib/yaml-parser/Parser.php');
-require(_pj_ROOT .'/libexec/pj-config/lib/yaml-parser/Inline.php');
-require(_pj_ROOT .'/libexec/pj-config/lib/yaml-parser/Unescaper.php');
+require(_PJ_ROOT .'/libexec/pj-config/lib/yaml-parser/Yaml.php');
+require(_PJ_ROOT .'/libexec/pj-config/lib/yaml-parser/Parser.php');
+require(_PJ_ROOT .'/libexec/pj-config/lib/yaml-parser/Inline.php');
+require(_PJ_ROOT .'/libexec/pj-config/lib/yaml-parser/Unescaper.php');
 
-require(_pj_ROOT .'/libexec/pj-config/lib/yaml-parser/Exception/ExceptionInterface.php');
-require(_pj_ROOT .'/libexec/pj-config/lib/yaml-parser/Exception/RuntimeException.php');
-require(_pj_ROOT .'/libexec/pj-config/lib/yaml-parser/Exception/ParseException.php');
+require(_PJ_ROOT .'/libexec/pj-config/lib/yaml-parser/Exception/ExceptionInterface.php');
+require(_PJ_ROOT .'/libexec/pj-config/lib/yaml-parser/Exception/RuntimeException.php');
+require(_PJ_ROOT .'/libexec/pj-config/lib/yaml-parser/Exception/ParseException.php');
 
 
 /**
@@ -25,13 +25,12 @@ function config()
 
 	if(!is_array($return))
 	{
-
 		// Grab tracked settings
-		$file = _pj_ROOT .'/conf/settings.yaml';
+		$file = _PJ_ROOT .'/conf/settings.yaml';
 		$settings = Symfony\Component\Yaml\Yaml::parse($file);
 
 		// Grab gitignored config
-		$file = _pj_ROOT .'/conf/config.yaml';
+		$file = _PJ_ROOT .'/conf/config.yaml';
 		$config = Symfony\Component\Yaml\Yaml::parse($file);
 
 		// Ensure we are always dealing with arrays
@@ -48,7 +47,7 @@ function config()
 }
 
 function array_merge_multi_dimension() {
-    $params = & func_get_args();
+    $params = func_get_args();
     $merged = array_shift($params); // using 1st array as base
 
     foreach ($params as $array) {
