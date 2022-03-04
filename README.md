@@ -8,16 +8,23 @@ For Auto Update to work, You need wget installed
   
 Place the following line, Modified with the correct path, in your .zshrc or .bashrc file in your user home directory
 
-    eval "$(/Users/jeffrey.roberts/Projects/payjoy_scripts/bin/pj init -)" 
- 
-# Example Commands
+    eval "$(THE_PATH_WHERE_YOU_CLONED_THIS_REPO/bin/pj init -)" 
+    
+You could also install your sub in a different directory, say `/usr/local`. This is just one way you could provide a way to install your sub.
 
-% pj test run 
-- Runs all php unit tests 
+# Adding commands
 
-% pj test create RevolvingCreditTestCase
-- Creates a skeleton test case
+    git checkout -b new-simple-command
+    touch libexec/pj-simple
+    chmod +x libexec/pj-simple
+    echo "#!/usr/bin/env bash" > libexec/pj-simple
+    git add libexec/pj-simple
+    git commit -m 'Simple Command'
+    pj scripts push
+    
+# Including Documentation
 
+    Please see below under "Self-Documenting" to add "Usage, Summary, and Help" comments to each of your commands
 
 # sub: a delicious way to organize programs
 
@@ -176,35 +183,6 @@ Let's say we want to shorten up our `rush who` to `rush w`. Just make a symlink!
     ln -s rush-who rush-w
 
 Now, `rush w` should run `libexec/rush-who`, and save you mere milliseconds of typing every day!
-
-## Prepare your sub
-
-Clone this repo:
-
-    git clone git://github.com/37signals/sub.git [name of your sub]
-    cd [name of your sub]
-    ./prepare.sh [name of your sub]
-
-The prepare script will run you through the steps for making your own sub. Also, don't call it `sub`, by the way! Give it a better name.
-
-## Install your sub
-
-So you've prepared your own sub, now how do you use it? Here's one way you could install your sub in your `$HOME` directory:
-
-    cd
-    git clone [YOUR GIT HOST URL]/sub.git .sub
-
-For bash users:
-
-    echo 'eval "$($HOME/.sub/bin/sub init -)"' >> ~/.bash_profile
-    exec bash
-
-For zsh users:
-
-    echo 'eval "$($HOME/.sub/bin/sub init -)"' >> ~/.zshenv
-    source ~/.zshenv
-
-You could also install your sub in a different directory, say `/usr/local`. This is just one way you could provide a way to install your sub.
 
 ## License
 
