@@ -48,7 +48,7 @@ if [[ "$curversion" != "$availversion" ]]; then
 
   echo $curversion > $SCRIPT_DIR/../tmp/.version
 
-  pj update > /dev/null 2>&1
+  pj scripts update > /dev/null 2>&1
 
 fi
 

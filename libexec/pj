@@ -7,7 +7,7 @@ if [[ ! -f "$SCRIPT_DIR/../tmp/.aurun" ]]; then
   
    echo "." > $SCRIPT_DIR/../tmp/.aurun
 
-   pj autoupdate > /dev/null 2>&1
+   pj scripts autoupdate > /dev/null 2>&1
 
    rm -rf $SCRIPT_DIR/../tmp/.aurun
 

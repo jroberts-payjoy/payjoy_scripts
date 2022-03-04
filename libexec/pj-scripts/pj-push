@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+ver=`cat $SCRIPTS_DIR/../tmp/.version`
+
+ver=`expr $ver + 1`
+
+echo $ver > $SCRIPT_DIR/../tmp/.version
+
+cd $SCRIPT_DIR/..
+
+git add tmp/.version
+
+git commit -m 'Incrementing Version'
+
+# get current branch 
+branch=`git symbolic-ref -q HEAD`
+
+git checkout master
+
+git merge $branch
+
+git push origin master
+
