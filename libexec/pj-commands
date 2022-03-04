@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Usage: pj commands
+# Summary: List all pj commands
+# Help: This command is mostly used for autocompletion in various shells, and for `pj help`.
+# Also, this command helps find commands that are named the same as potentially builtin shell commands (which, cd, etc)
+
+set -e
+
+if [ "$1" = "--sh" ]; then
+  sh=1
+  shift
+elif [ "$1" = "--no-sh" ]; then
+  nosh=1
+  shift
+fi
+
+shopt -s nullglob
+
+if grep -i "^# provide pj completions" "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" >/dev/null; then
+  completions=`exec "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" --complete "$@"`
+  if [ "$completions" ]; then
+    echo $completions
+  fi
+  exit
+fi
+
+{ for path in ${PATH//:/$'\n'}; do
+    for command in "${path}/pj-"*; do
+      if [ ! "$command" == "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" ] || [ "$_SUB_COMMAND_FILE" == "commands" ]; then
+        if [ -d "$_SUB_COMMAND_ROOT" ] && [ "$_SUB_COMMAND_ROOT" == "$path" ]; then
+          do_commands="true"
+        elif [ ! -d "$_SUB_COMMAND_ROOT" ] || [ "$_SUB_COMMAND_ROOT" == "$_PJ_ROOT/libexec" ]; then
+          do_commands="true"
+        else
+          do_commands="false"
+        fi
+      elif [ "$command" == "commands" ] && [ "$command" == "$_SUB_COMMAND_FILE" ]; then
+        do_commands="true"
+      else
+        do_commands="false"
+      fi
+       if [ "$do_commands" == "true" ]; then
+        command="${command##*pj-}"
+        if [ -n "$sh" ]; then
+          if [ ${command:0:3} = "sh-" ]; then
+            echo ${command##sh-}
+          fi
+        elif [ -n "$nosh" ]; then
+          if [ ${command:0:3} != "sh-" ]; then
+            echo ${command##sh-}
+          fi
+        else
+          echo ${command##sh-}
+        fi
+      fi
+    done
+  done
+} | sort | uniq

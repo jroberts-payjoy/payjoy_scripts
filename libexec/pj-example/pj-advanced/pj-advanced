@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Usage: pj example advanced
+# Summary: List all Advanced pj Example Scripts
+# Help: This command lists all of the Advanced pj Example Scripts
+
+set -e
+
+pj help example bash advanced

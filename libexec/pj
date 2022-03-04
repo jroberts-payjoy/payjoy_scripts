@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -e
+
+resolve_link() {
+  $(type -p greadlink readlink | head -1) "$1"
+}
+
+abs_dirname() {
+  local cwd="$(pwd)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+libexec_path="$(abs_dirname "$0")"
+export _PJ_ROOT="$(abs_dirname "$libexec_path")"
+
+commands=($@)
+
+path_builder="$_PJ_ROOT/libexec"
+command_builder=""
+_SUB_COMMAND_IS="false"
+prev_command=""
+
+_SUB_EXECUTABLES=(".sh" ".php" ".py")
+
+for (( i=0; i<=${#commands[@]}; i++ ))
+do
+  if [ "${commands[$i]}" != "" ] && [[ "${commands[$i]}" != -* ]]; then
+    if [ -d "$path_builder/pj-${commands[$i]}" ]; then
+      path_builder="$path_builder/pj-${commands[$i]}"
+    fi
+
+    if [ -f "$path_builder/pj-${commands[$i]}" ]; then
+      prev_command=$command_builder
+      command_builder="${commands[$i]}"
+      _SUB_COMMAND_IS="true"
+    else
+      _SUB_COMMAND_IS="false"
+    fi
+
+    if [ "$_SUB_COMMAND_IS"  == "false" ]; then
+      for exe in ${_SUB_EXECUTABLES[@]}; do
+        if [ -f "$path_builder/pj-${commands[$i]}$exe" ]; then
+          prev_command=$command_builder
+          command_builder="${commands[$i]}$exe"
+          _SUB_COMMAND_IS="true"
+        else
+          _SUB_COMMAND_IS="false"
+        fi
+
+        if [ "$_SUB_COMMAND_IS"  == "true" ]; then
+          break
+        fi
+      done
+    fi
+  fi
+
+  if [[ "${commands[$i]}" == -* ]]; then
+    break
+  fi
+done
+
+flags=""
+flags_on="false"
+for (( i=0; i<=${#commands[@]}; i++ ))
+do
+  if [[ "${commands[$i]}" == -* ]] || [ "$flags_on" == "true" ]; then
+    flags="$flags${commands[$i]} "
+    flags_on="true"
+  fi
+done
+
+export _SUB_COMMAND_ROOT="$path_builder"
+export _SUB_COMMAND_FILE="$command_builder"
+export _SUB_COMMAND_VARS="$@"
+export _SUB_COMMAND_IS="$_SUB_COMMAND_IS"
+
+if [ -d "$_SUB_COMMAND_ROOT" ]; then
+  export PATH="${libexec_path}:$_SUB_COMMAND_ROOT:$PATH"
+else
+  export PATH="${libexec_path}:$PATH"
+fi
+
+command="$1"
+if [ "$command" == "" ] || [ "$command" == "-h" ] || [ "$command" == "-help" ]; then
+  exec pj-help
+  exit
+elif [ "$command" == "help" ] || [ "$command" == "commands" ]; then
+  command_path="$(command -v "pj-$command" || true)"
+else
+  command_path="$(command -v "pj-$command_builder" || true)"
+fi
+
+if [ ! -x "$command_path" ]; then
+  echo "pj: no such command \`$command'" >&2
+  exit 1
+fi
+
+shift
+if [ "$flags" == "" ]; then
+  exec "$command_path" "$@"
+else
+  exec "$command_path" $flags
+fi

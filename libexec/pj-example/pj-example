@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Usage: pj example [command]
+# Summary: Collection of BASH Sub Example Scripts
+# Help: These commands are mostly used as examples and for testing pj modifications
+
+set -e
+
+pj help example

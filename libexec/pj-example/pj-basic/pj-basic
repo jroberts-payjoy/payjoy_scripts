@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Usage: pj example bash basic
+# Summary: List all basic pj Example Scripts
+# Help: This command lists all of the basic pj Example Scripts
+
+set -e
+
+pj help example bash basic

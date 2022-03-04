@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+set -e
+
+print_summaries() {
+
+  local pj_commands="$(pj commands)"
+  local commands=()
+  local summaries=()
+  local longest_command=0
+  local command
+
+  if [[ "$0" == *help ]]; then
+    pj_commands="$(pj commands $_SUB_COMMAND_VARS)"
+    if [ -f "$pj_commands" ]; then
+      print_help $pj_commands
+      exit
+    fi
+  fi
+
+  for command in ${pj_commands[@]}; do
+    local file="$(command_path "$command")"
+    if [ ! -h "$file" ] && [ -f "$file" ]; then
+      local summary="$(summary "$file")"
+      if [ -n "$summary" ]; then
+
+        if [ -d "$_SUB_COMMAND_ROOT/pj-$command" ]; then
+          commands["${#commands[@]}"]="-> $command"
+        else
+          commands["${#commands[@]}"]="$command"
+        fi
+
+        summaries["${#summaries[@]}"]="$summary"
+
+        if [ "${#command}" -gt "$longest_command" ]; then
+          longest_command=`expr ${#command} + 3`
+        fi
+      fi
+    fi
+  done
+
+  local index
+  local columns="$(tput cols)"
+  local summary_length=$(( $columns - $longest_command - 5 ))
+
+  for (( index=0; index < ${#commands[@]}; index++ )); do
+    printf "   %-${longest_command}s  %s\n" "${commands[$index]}" \
+      "$(truncate "$summary_length" "${summaries[$index]}")"
+  done
+}
+
+print_help() {
+  local file="$1"
+  local usage="$(usage "$file")"
+
+  if [ -n "$usage" ]; then
+    echo "$usage"
+
+    local help="$(help "$file")"
+    [ -n "$help" ] && echo && echo "$help"
+  else
+    echo "Sorry, this command isn't documented yet."
+  fi
+}
+
+command_path() {
+  pj_path="$(command -v "pj-$command" || command -v "pj-sh-$command" || true)"
+  if [ "$pj_path" == "" ] && [ -f "$_SUB_COMMAND_ROOT/pj-$command/pj-$command" ]; then
+    echo "$_SUB_COMMAND_ROOT/pj-$command/pj-$command"
+  else
+    echo "$pj_path"
+  fi
+}
+
+summary() {
+  sed -n "s/^# Summary: \(.*\)/\1/p" "$1"
+}
+
+usage() {
+  sed -n "s/^# \(Usage: .*\)/\1/p" "$1"
+}
+
+help() {
+  awk '/^[^#]/{p=0} /^# Help:/{p=1} p' "$1" | sed "s/^# Help: //;s/^# //;s/^#//"
+}
+
+truncate() {
+  local max_length="$1"
+  local string="$2"
+
+  if [ "${#string}" -gt "$max_length" ]; then
+    local length=$(( $max_length - 3 ))
+    echo "${string:0:$length}..."
+  else
+    echo "$string"
+  fi
+}
+
+print_command_help() {
+  local file="$1"
+  local usage="$(usage "$file")"
+
+  if [ -n "$usage" ]; then
+    echo "$usage"
+
+    local help="$(help "$file")"
+    [ -n "$help" ] && echo && echo "$help"
+
+    local _SUB_SUMMARY="$(print_summaries)"
+
+    if [ ! "$_SUB_SUMMARY" == "" ]; then
+      echo "
+Some useful pj $command commands are:
+
+$(print_summaries)
+
+See 'pj $_SUB_COMMAND_VARS [command]' for information on a specific command."
+    fi
+  else
+    echo "Sorry, this command isn't documented yet."
+  fi
+}
+
+# Provide pj completions
+if [ "$1" = "--complete" ]; then
+  echo "$(pj commands)"
+  exit
+fi
+
+command="$_SUB_COMMAND_FILE"
+if [[ "$command" == "" || "$command" == "help" ]] && [[ ! "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE ]]; then
+echo "Usage: pj $command [<args>]
+
+Some useful pj $command commands are:
+$(print_summaries)
+
+See 'pj $_SUB_COMMAND_VARS' for information on a specific command."
+
+else
+  file="$(command_path "$command")"
+
+  if [ -n "$file" ]; then
+    if [[ "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE ]]; then
+      print_command_help "$file"
+    else
+      print_help "$file"
+    fi
+  else
+    echo "pj: no such command \`$command'" >&2
+    exit 1
+  fi
+fi
