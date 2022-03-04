@@ -3,13 +3,13 @@ set -e
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-if [[ ! -f "$SCRIPT_DIR/../tmp/.aurun" ]]; then
+if [[ ! -f "$SCRIPT_DIR/../.aurun" ]]; then
   
-   echo "." > $SCRIPT_DIR/../tmp/.aurun
+   echo "." > $SCRIPT_DIR/../.aurun
 
    pj scripts autoupdate
 
-   rm -rf $SCRIPT_DIR/../tmp/.aurun
+   rm -rf $SCRIPT_DIR/../.aurun
 
 fi
 

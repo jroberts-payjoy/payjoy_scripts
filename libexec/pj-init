@@ -59,7 +59,7 @@ echo "export PATH=\"\${PATH}:${_PJ_ROOT}/bin\""
 
 case "$shell" in
 bash | zsh )
-  echo "source \"$root/completions/pj.${shell}\""
+  echo "source \"$root/bin/completions/pj.${shell}\""
   ;;
 esac
 

@@ -7,11 +7,11 @@ set -e
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-ver=`cat $SCRIPT_DIR/../../tmp/.version`
+ver=`cat $SCRIPT_DIR/../../.version`
 
 ver=`expr $ver + 1`
 
-echo $ver > $SCRIPT_DIR/../../tmp/.version
+echo $ver > $SCRIPT_DIR/../../.version
 
 cd $SCRIPT_DIR/../..
 

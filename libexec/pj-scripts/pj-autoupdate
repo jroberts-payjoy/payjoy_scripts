@@ -40,12 +40,12 @@ function __wget() {
 
 cwwd=`echo $PWD`
 
-wget https://raw.githubusercontent.com/jroberts-payjoy/payjoy_scripts/master/tmp/.version -O $SCRIPT_DIR/../../tmp/.available_version > /dev/null 2>&1
+wget https://raw.githubusercontent.com/jroberts-payjoy/payjoy_scripts/master/tmp/.version -O $SCRIPT_DIR/../../.available_version > /dev/null 2>&1
 
-availversion=`cat $SCRIPT_DIR/../../tmp/.version`
-curversion=`cat $SCRIPT_DIR/../../tmp/.available_version`
+availversion=`cat $SCRIPT_DIR/../../.version`
+curversion=`cat $SCRIPT_DIR/../../.available_version`
 
-rm -rf $SCRIPT_DIR/../../tmp/.available_version
+rm -rf $SCRIPT_DIR/../../.available_version
 
 if [[ "$curversion" -gt "$availversion" ]]; then
 
