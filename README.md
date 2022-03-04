@@ -22,7 +22,7 @@ Place the following line, Modified with the correct path, in your .zshrc or .bas
     
 # Including Documentation
 
-    Please see below to add "Usage, Summary, and Help" comments to each of your commands
+    Please see below under "Self-Documenting" to add "Usage, Summary, and Help" comments to each of your commands
 
 # sub: a delicious way to organize programs
 
