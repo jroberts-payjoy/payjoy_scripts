@@ -12,7 +12,7 @@ Place the following line, Modified with the correct path, in your .zshrc or .bas
 
 # Example Commands
 
-% pj test run
+% pj test run 
 - Runs all php unit tests 
 
 % pj test create RevolvingCreditTestCase
