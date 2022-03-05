@@ -49,7 +49,11 @@ rm -rf $SCRIPT_DIR/../../.available_version
 
 if [[ "$curversion" -gt "$availversion" ]]; then
 
+  echo "Autoupdating, newer version found online..."
+
   pj scripts update > /dev/null 2>&1
+
+  echo ""
 
 fi
 
