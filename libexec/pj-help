@@ -127,15 +127,29 @@ if [ "$1" = "--complete" ]; then
 fi
 
 command="$_SUB_COMMAND_FILE"
-if [[ "$command" == "" || "$command" == "help" ]] && [[ ! "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE ]]; then
-echo "Usage: pj $command [<args>]
+if [[ "$command" == "help" || "$command" == "" ]] && [[ ! "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE ]]; then
 
-Some useful pj $command commands are:
-$(print_summaries)
+if [[ "$command" == "" ]]; then
 
-See 'pj $_SUB_COMMAND_VARS' for information on a specific command."
+  echo "Usage: pj [commannd] [<args>]
+
+  Some useful pj commands are:
+  $(print_summaries)
+
+  See 'pj help [command]' for information on a specific command."
 
 else
+
+  echo "Usage: pj $command [<args>]
+
+  Some useful pj $command commands are:
+  $(print_summaries)
+
+  See 'pj $_SUB_COMMAND_VARS' for information on a specific command."
+fi
+
+else
+
   file="$(command_path "$command")"
 
   if [ -n "$file" ]; then
