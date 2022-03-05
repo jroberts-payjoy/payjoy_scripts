@@ -129,24 +129,37 @@ fi
 command="$_SUB_COMMAND_FILE"
 if [[ "$command" == "help" || "$command" == "" ]] && [[ ! "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE ]]; then
 
-if [[ "$command" == "" ]]; then
+  if [[ "$command" == "help" ]]; then
 
-  echo "Usage: pj [commannd] [<args>]
+    echo "Usage: pj help [commannd] [<args>]
 
-  Some useful pj commands are:
-  $(print_summaries)
+    Some useful pj commands are:
+    $(print_summaries)
 
-  See 'pj help [command]' for information on a specific command."
+    See 'pj help [command]' for information on a specific command."
 
-else
+  else
 
-  echo "Usage: pj $command [<args>]
+    if [[ "$command" == "" ]]; then
 
-  Some useful pj $command commands are:
-  $(print_summaries)
+      echo "Usage: pj [commannd] [<args>]
 
-  See 'pj $_SUB_COMMAND_VARS' for information on a specific command."
-fi
+      Some useful pj commands are:
+      $(print_summaries)
+
+      See 'pj help [command]' for information on a specific command."
+
+    else
+
+      echo "Usage: pj $command [<args>]
+
+      Some useful pj $command commands are:
+      $(print_summaries)
+
+      See 'pj $_SUB_COMMAND_VARS' for information on a specific command."
+    fi
+
+  fi
 
 else
 
