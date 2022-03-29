@@ -10,7 +10,7 @@ set -e
 
 # If only one variable, put script in root of folder, if two or more, check if directory exists, and if not create it
 
-shift
+cd $SCRIPT_DIR
 
 if [ "$#" -lt 1 ]; then
 
@@ -22,11 +22,15 @@ fi
 
 if [ "$#" -eq 1 ]; then
 
+	git_branch="new-command-$1"
 	command_path=$SCRIPT_DIR/libexec/pj-$1
+	git_file=libexec/pj-$1
 
 else
 
+	git_branch="new-command"
 	command_path=$SCRIPT_DIR/libexec
+	git_file=libexec
 fi
 
 if [ "$#" -gt 1 ]; then
@@ -35,8 +39,12 @@ if [ "$#" -gt 1 ]; then
 
 	for (( i=0; i < ${#commands[@]}; i++ ))
 	do
-	
-	  command_path=$command_path/pj-"${commands[$i]}"
+
+		git_branch="$git_branch-${commands[$i]}"
+		command_path=$command_path/pj-"${commands[$i]}"
+		git_file=$git_file/pj-"${commands[$i]}"
+
+		shift
 	
 	done
 
@@ -48,7 +56,7 @@ if [ ! -d "$(dirname "$command_path")" ]; then
 
 fi
 
-git checkout -b new-command-$1
+git checkout -b $git_branch
 
 touch $command_path
 
@@ -59,7 +67,11 @@ echo '# Help: HELP_PLACE_HOLDER' > $command_path
 
 chmod +x $command_path
 
-git add $command_path
+echo
+echo "Command created: $git_file"
+echo
+
+git add $git_file
 git commit -m "New Command $@"
 
 pj scripts push

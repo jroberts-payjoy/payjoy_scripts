@@ -45,17 +45,22 @@ _SUB_EXECUTABLES=(".sh" ".php" ".py")
 
 for (( i=0; i<=${#commands[@]}; i++ ))
 do
+
   if [ "${commands[$i]}" != "" ] && [[ "${commands[$i]}" != -* ]]; then
     if [ -d "$path_builder/pj-${commands[$i]}" ]; then
+    
       path_builder="$path_builder/pj-${commands[$i]}"
-    fi
-
-    if [ -f "$path_builder/pj-${commands[$i]}" ]; then
+    
+    elif [ -f "$path_builder/pj-${commands[$i]}" ]; then
+    
       prev_command=$command_builder
       command_builder="${commands[$i]}"
       _SUB_COMMAND_IS="true"
+    
     else
+    
       _SUB_COMMAND_IS="false"
+    
     fi
 
     if [ "$_SUB_COMMAND_IS"  == "false" ]; then
@@ -76,6 +81,10 @@ do
   fi
 
   if [[ "${commands[$i]}" == -* ]]; then
+    break
+  fi
+
+  if [ "$_SUB_COMMAND_IS"  == "true" ]; then
     break
   fi
 done
@@ -116,6 +125,7 @@ if [ ! -x "$command_path" ]; then
   exit 1
 fi
 
+shift
 shift
 
 if [ "$flags" == "" ]; then
