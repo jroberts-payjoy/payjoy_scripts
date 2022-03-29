@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/..
 
 if [[ ! -f "$SCRIPT_DIR/../.aurun" ]]; then
   
@@ -117,6 +117,8 @@ if [ ! -x "$command_path" ]; then
 fi
 
 shift
+shift
+
 if [ "$flags" == "" ]; then
   exec "$command_path" "$@"
 else
