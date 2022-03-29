@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Usage: pj scripts create
+# Summary: This script is called by the root script to autoupdate the local pj script repository
+# Help: Do not use this script manually
+
+set -e
+
+# Example with command group
+# -> pj scripts create <command groupt> <command name>
+
+# If only one variable, put script in root of folder, if two or more, check if directory exists, and if not create it
+
+if [ "$#" -lt 1 ]; then
+
+	echo "Wrong number of arguments..."
+    echo "Example: pj scripts create (command name)"
+	echo "Example: pj scripts create [command group]+ (command name)"
+
+fi
+
+if [ "$#" -eq 1 ]; then
+
+	command_path=$SCRIPT_DIR/libexec/pj-$1
+
+else
+
+	command_path=$SCRIPT_DIR/libexec
+fi
+
+if [ "$#" -gt 1 ]; then
+
+	commands=($@)
+
+	for (( i=0; i < ${#commands[@]}; i++ ))
+	do
+	
+	  command_path=$command_path/pj-"${commands[$i]}"
+	
+	done
+
+fi
+
+if [ ! -d "$(dirname "$command_path")" ]; then
+
+	mkdir -p "$(dirname "$1")"
+
+fi
+
+git checkout -b new-command-$1
+
+touch $command_path
+
+echo '#!/usr/bin/env bash' > $command_path
+echo "# Usage: pj $@" > $command_path
+echo '# Summary: SUMMARY_PLACE_HOLDER' > $command_path
+echo '# Help: HELP_PLACE_HOLDER' > $command_path
+
+chmod +x $command_path
+
+git add $command_path
+git commit -m "New Command $@"
+
+pj scripts push
