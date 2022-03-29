@@ -10,6 +10,8 @@ set -e
 
 # If only one variable, put script in root of folder, if two or more, check if directory exists, and if not create it
 
+shift
+
 if [ "$#" -lt 1 ]; then
 
 	echo "Wrong number of arguments..."
