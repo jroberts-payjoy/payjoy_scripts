@@ -126,7 +126,6 @@ if [ ! -x "$command_path" ]; then
 fi
 
 shift
-shift
 
 if [ "$flags" == "" ]; then
   exec "$command_path" "$@"
