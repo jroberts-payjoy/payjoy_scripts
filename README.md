@@ -14,7 +14,7 @@ You could also install your sub in a different directory, say `/usr/local`. This
 
 # Adding commands
 
-    pj scripts create [command_group] <command_name>
+    pj scripts create [command_group]+ <command_name>
     
     Example:
     pj scripts create money testscript
