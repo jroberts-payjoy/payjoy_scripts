@@ -14,13 +14,10 @@ You could also install your sub in a different directory, say `/usr/local`. This
 
 # Adding commands
 
-    git checkout -b new-simple-command
-    touch libexec/pj-simple
-    chmod +x libexec/pj-simple
-    echo "#!/usr/bin/env bash" > libexec/pj-simple
-    git add libexec/pj-simple
-    git commit -m 'Simple Command'
-    pj scripts push
+    pj scripts create [command_group] <command_name>
+    
+    Example:
+    pj scripts create money testscript
     
 # Using YAML config files in conf/
 
