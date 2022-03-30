@@ -67,9 +67,9 @@ git checkout -b $git_branch
 touch $command_path
 
 echo '#!/usr/bin/env bash' > $command_path
-echo "# Usage: pj $@" > $command_path
-echo '# Summary: SUMMARY_PLACE_HOLDER' > $command_path
-echo '# Help: HELP_PLACE_HOLDER' > $command_path
+echo "# Usage: pj $@" >> $command_path
+echo '# Summary: SUMMARY_PLACE_HOLDER' >> $command_path
+echo '# Help: HELP_PLACE_HOLDER' >> $command_path
 
 chmod +x $command_path
 
