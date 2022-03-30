@@ -46,15 +46,19 @@ if [ "$#" -gt 1 ]; then
 		command_path=$command_path/pj-"${commands[$i]}"
 		git_file=$git_file/pj-"${commands[$i]}"
 
+		if [ ${#commands[@]} -gt 1 ]; then
+
+			if [ ! -d "$(dirname "$command_path")" ]; then
+
+				mkdir -p "$(dirname "$command_path")"
+
+			fi
+
+		fi
+
 		shift
 	
 	done
-
-fi
-
-if [ ! -d "$(dirname "$command_path")" ]; then
-
-	mkdir -p "$(dirname "$1")"
 
 fi
 
