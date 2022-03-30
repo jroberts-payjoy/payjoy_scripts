@@ -1,1 +1,8 @@
-# Help: HELP_PLACE_HOLDER
+#!/usr/bin/env bash
+# Usage: pj money
+# Summary: The money team scripts directory root script
+# Help: List the money team scripts
+
+set -e
+
+pj help money

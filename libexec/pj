@@ -51,7 +51,9 @@ do
     
       path_builder="$path_builder/pj-${commands[$i]}"
     
-    elif [ -f "$path_builder/pj-${commands[$i]}" ]; then
+    fi
+    
+    if [ -f "$path_builder/pj-${commands[$i]}" ]; then
     
       prev_command=$command_builder
       command_builder="${commands[$i]}"
@@ -119,6 +121,8 @@ elif [ "$command" == "help" ] || [ "$command" == "commands" ]; then
 else
   command_path="$(command -v "pj-$command_builder" || true)"
 fi
+
+echo $command_path
 
 if [ ! -x "$command_path" ]; then
   echo "pj: no such command \`$command'" >&2
