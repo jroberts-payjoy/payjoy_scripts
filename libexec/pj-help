@@ -90,7 +90,15 @@ print_help() {
     [ -n "$help" ] && echo && echo "      ($help)"
     echo
   else
-    echo "${_RED}Sorry, this command isn't documented yet.${_RESET}"
+    if [ "$file" == "$_PJ_ROOT/libexec" ]; then
+
+      exec pj help
+
+    else
+
+      echo "${_RED}Sorry, this command isn't documented yet.${_RESET}"
+      
+    fi
   fi
 }
 
