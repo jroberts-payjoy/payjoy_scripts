@@ -6,6 +6,7 @@ print_summaries() {
   local pj_commands="$(pj commands $@)"
   local commands=()
   local summaries=()
+  local usages=()
   local longest_command=0
   local command
 
@@ -34,6 +35,10 @@ print_summaries() {
 
     if [ ! -h "$file" ] && [ -f "$file" ]; then
       local summary="$(summary "$file")"
+      local usage="$(usage $file)"
+
+      usages["${#commands[@]}"]="$usage"
+
       if [ -n "$summary" ]; then
 
         command=$(basename $command)
@@ -61,8 +66,10 @@ print_summaries() {
   local summary_length=$(( $columns - $longest_command - 5 ))
 
   for (( index=0; index < ${#commands[@]}; index++ )); do
-    printf "   %-${longest_command}s  %s\n" "${commands[$index]}" \
-      "( $(truncate "$summary_length" "${summaries[$index]}") )"
+    printf "   ${_GREEN}%-${longest_command}s${_RESET}  %s\n" "${commands[$index]}" \
+      "[ ${_YELLOW}$(truncate "$summary_length" "${usages[$index]}")${_RESET} ]"
+    printf "   %-${longest_command}s  ${_CYAN}%s${_RESET}\n" " " "( $(truncate "$summary_length" "${summaries[$index]}") )"
+    echo
   done
 }
 
@@ -83,7 +90,7 @@ print_help() {
     [ -n "$help" ] && echo && echo "      ($help)"
     echo
   else
-    echo "Sorry, this command isn't documented yet."
+    echo "${_RED}Sorry, this command isn't documented yet.${_RESET}"
   fi
 }
 
@@ -157,7 +164,7 @@ print_command_help() {
 
     fi
   else
-    echo "Sorry, this command isn't documented yet."
+    echo "${_RED}Sorry, this command isn't documented yet.${_RESET}"
   fi
 }
 
@@ -171,13 +178,14 @@ fi
 if [ "$_SUB_COMMAND_JUST_HELP" == "true" ]; then
 
           echo "
-      Usage: pj [commannd] [<args>]
+      ${_YELLOW}Usage${_RESET}: ${_MAGENTA}pj [commannd] [<args>]${_RESET}
 
-      Some useful pj commands are:
 
 $(print_summaries)
 
-      See 'pj help [command]' for information on a specific command.
+
+      ${_RESET}See${_RESET} '${_YELLOW}pj help [command]${_RESET}' ${_RESET}for information on a specific command.${_RESET}
+
 "
 
 exit
@@ -188,13 +196,15 @@ fi
 if [ "$_SUB_COMMAND_HELP_DIR_ONLY" == "true" ]; then
 
  echo "
-      Usage: pj $@ [<command>]
 
-      Some useful pj $@ commands are:
+      ${_YELLOW}Usage${_RESET}: ${_MAGENTA}pj $@ [<command>]${_RESET}
+
 
 $(print_summaries $@)
 
-      See 'pj help [command]' for information on a specific command.
+
+      ${_RESET}See${_RESET} '${_YELLOW}pj help [command]${_RESET}' ${_RESET}for information on a specific command.${_RESET}
+
 "
 
   exit
@@ -215,7 +225,7 @@ elif [ -f "$_SUB_COMMAND_HELP" ]; then
 
 fi
 
-exit
+exit 
 
 command="$_SUB_COMMAND_FILE"
 
@@ -224,30 +234,32 @@ if [[ "$command" == "" ]] && [[ ! "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE
     if [[ "$command" == "" ]] || [[ "$command" == "pj-help" ]]; then
 
       echo "
-      Usage: pj [commannd] [<args>]
 
-      Some useful pj commands are:
+      ${_YELLOW}Usage${_RESET}: ${_MAGENTA}pj [commannd] [<args>]${_RESET}
+
 
 $(print_summaries)
 
-      See 'pj help [command]' for information on a specific command.
+
+
+      ${_RESET}See${_RESET} '${_YELLOW}pj help [command]${_RESET}' ${_RESET}for information on a specific command.${_RESET}
+
 "
     else
       echo "
-      Usage: pj $command [<args>]
 
-      Some useful pj $command commands are:
+      ${_YELLOW}Usage${_RESET}: ${_MAGENTA}pj $command [<args>]${_RESET}
+
 
 $(print_summaries)
 
-      See 'pj $_SUB_COMMAND_VARS' for information on a specific command.
+
+      ${_RESET}See${_RESET} '${_YELLOW}pj $_SUB_COMMAND_VARS ${_RESET}' ${_RESET}for information on a specific command.${_RESET}
+
 "
     fi
 
 else
-
-
-  exit
 
   file="$(command_path "$command")"
   if [ -n "$file" ]; then
@@ -257,7 +269,7 @@ else
       print_help "$file"
     fi
   else
-    echo "pj: no such command \`$command'" >&2
+    echo "${_RED}pj${_RESET}: ${_YELLOW}no such command \`$command'${_RESET}" >&2
     exit 1
   fi
 fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Usage: pj scripts create [command group] <command>
-# Summary: Create a new pj command
+# Usage: pj scripts create [command group](+) <command>
+# Summary: This script will create a new pj command
 # Help: Create a new pj command by specifying one+ command groups and command name
 
 set -e
