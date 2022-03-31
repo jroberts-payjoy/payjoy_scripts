@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
-set -e
 
 export SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/..
+
+if [[ ! -f "$SCRIPT_DIR/../.setx" ]]; then
+  
+   echo "." > $SCRIPT_DIR/../.setx
+
+   set -e
+
+   rm -rf $SCRIPT_DIR/../.setx
+else
+
+  set -e
+
+fi
 
 if [[ ! -f "$SCRIPT_DIR/../.aurun" ]]; then
   
@@ -36,59 +48,112 @@ export _PJ_ROOT="$(abs_dirname "$libexec_path")"
 
 commands=($@)
 
-path_builder="$_PJ_ROOT/libexec"
-command_builder=""
-_SUB_COMMAND_IS="false"
-prev_command=""
-
-_SUB_EXECUTABLES=(".sh" ".php" ".py")
+counter=0
 
 for (( i=0; i<=${#commands[@]}; i++ ))
 do
 
   if [ "${commands[$i]}" != "" ] && [[ "${commands[$i]}" != -* ]]; then
-    if [ -d "$path_builder/pj-${commands[$i]}" ]; then
-    
-      path_builder="$path_builder/pj-${commands[$i]}"
-    
-    fi
-    
+
+    counter=`expr $counter + 1`
+
+  fi
+
+done
+
+path_builder="$_PJ_ROOT/libexec"
+command_builder=""
+prev_command=""
+_SUB_COMMAND_IS="false"
+is_help_command="false"
+is_just_help_command="false"
+help_command_path="$_PJ_ROOT/libexec"
+help_command_path_dir="$_PJ_ROOT/libexec"
+help_command_path_dir_only="false"
+help_command=""
+is_commands_command="false"
+
+for (( i=0; i < $counter; i++ ))
+do
+
+  islastarg=`expr $counter - $i`
+
+  if [ $i -eq 0 ] && [ "${commands[$i]}" == "commands" ]; then
+
+    is_commands_command="true"
+
+  fi
+
+  if [ "$is_help_command" == "false" ]; then
+
     if [ -f "$path_builder/pj-${commands[$i]}" ]; then
-    
+
       prev_command=$command_builder
-      command_builder="${commands[$i]}"
+
+      command_builder="pj-${commands[$i]}"
+
       _SUB_COMMAND_IS="true"
-    
-    else
-    
-      _SUB_COMMAND_IS="false"
-    
+
     fi
 
-    if [ "$_SUB_COMMAND_IS"  == "false" ]; then
-      for exe in ${_SUB_EXECUTABLES[@]}; do
-        if [ -f "$path_builder/pj-${commands[$i]}$exe" ]; then
-          prev_command=$command_builder
-          command_builder="${commands[$i]}$exe"
-          _SUB_COMMAND_IS="true"
-        else
-          _SUB_COMMAND_IS="false"
-        fi
+  fi
 
-        if [ "$_SUB_COMMAND_IS"  == "true" ]; then
-          break
-        fi
-      done
+  if [ -d "$path_builder/pj-${commands[$i]}" ] && [ "$is_help_command" == "false" ] && [ "$is_commands_command" == "false" ]; then
+
+    path_builder="$path_builder/pj-${commands[$i]}"
+
+    _SUB_COMMAND_IS="false"
+
+  fi
+
+  if [ $i -gt 0 ] && [ "$is_help_command"  == "true" ] && [ "$is_commands_command" == "false" ]; then
+
+
+    if [ -d "$help_command_path_dir/pj-${commands[$i]}" ]; then
+
+      help_command_path_dir="$help_command_path_dir/pj-${commands[$i]}"
+      help_command="pj-${commands[$i]}"
+      help_command_path_dir_only="true"
+
+    elif [ -f "$help_command_path_dir/pj-${commands[$i]}" ] && [ "$is_commands_command" == "false" ]; then
+
+      help_command_path="$help_command_path_dir/pj-${commands[$i]}"  
+      help_command_path_dir_only="false"    
+
     fi
+
   fi
 
-  if [[ "${commands[$i]}" == -* ]]; then
-    break
+  if [ $i -gt 0 ] && [ "$is_help_command"  == "false" ] && [ "$is_commands_command" == "true" ]; then
+
+    if [ -d "$help_command_path_dir/pj-${commands[$i]}" ]; then
+
+      help_command_path_dir="$help_command_path_dir/pj-${commands[$i]}"
+      help_command="pj-${commands[$i]}"
+      help_command_path_dir_only="true"
+
+    elif [ -f "$help_command_path_dir/pj-${commands[$i]}" ] && [ "$is_commands_command" == "true" ]; then
+
+      help_command_path="$help_command_path_dir/pj-${commands[$i]}"  
+      help_command_path_dir_only="false"    
+
+    fi
+
   fi
 
-  if [ "$_SUB_COMMAND_IS"  == "true" ]; then
-    break
+  if [ $i -eq 0 ] && [ "${commands[$i]}" == "help" ]; then
+
+    is_help_command="true"
+
   fi
+
+  if [ $counter -eq 1 ] && [ $i -eq 0 ] && [ "${commands[$i]}" == "help" ]; then
+
+    is_just_help_command="true"
+
+  fi
+
+
 done
 
 flags=""
@@ -101,10 +166,21 @@ do
   fi
 done
 
+if [ "$command_builder" == "pj-help" ]; then
+
+  path_builder="$_PJ_ROOT/libexec"
+
+fi
+
 export _SUB_COMMAND_ROOT="$path_builder"
 export _SUB_COMMAND_FILE="$command_builder"
 export _SUB_COMMAND_VARS="$@"
 export _SUB_COMMAND_IS="$_SUB_COMMAND_IS"
+export _SUB_COMMAND_HELP="$help_command_path"
+export _SUB_COMMAND_JUST_HELP="$is_just_help_command"
+export _SUB_COMMAND_HELP_DIR="$help_command_path_dir"
+export _SUB_COMMAND_HELP_DIR_ONLY="$help_command_path_dir_only"
+export _SUB_COMMAND_HELP_DIR_ONLY_FILE="$help_command"
 
 if [ -d "$_SUB_COMMAND_ROOT" ]; then
   export PATH="${libexec_path}:$_SUB_COMMAND_ROOT:$PATH"
@@ -119,20 +195,25 @@ if [ "$command" == "" ] || [ "$command" == "-h" ] || [ "$command" == "-help" ]; 
 elif [ "$command" == "help" ] || [ "$command" == "commands" ]; then
   command_path="$(command -v "pj-$command" || true)"
 else
-  command_path="$(command -v "pj-$command_builder" || true)"
+  command_path="$(command -v "$command_builder" || true)"
 fi
 
-echo $command_path
+if [ -f "$path_builder/$command_builder" ]; then
+  
+  shift
 
-if [ ! -x "$command_path" ]; then
-  echo "pj: no such command \`$command'" >&2
-  exit 1
-fi
+  if [ "$flags" == "" ]; then
+    exec "$command_path" "$@"
+  else
+    exec "$command_path" $flags
+  fi
 
-shift
-
-if [ "$flags" == "" ]; then
-  exec "$command_path" "$@"
 else
-  exec "$command_path" $flags
+
+  echo "$path_builder/$command_builder"
+
+  echo "pj: no such command \`$command'" >&2
+  
+  exit 1
+
 fi

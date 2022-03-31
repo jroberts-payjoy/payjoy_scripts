@@ -3,30 +3,48 @@ set -e
 
 print_summaries() {
 
-  local pj_commands="$(pj commands)"
+  local pj_commands="$(pj commands $@)"
   local commands=()
   local summaries=()
   local longest_command=0
   local command
 
-  if [[ "$0" == *help ]]; then
-    pj_commands="$(pj commands $_SUB_COMMAND_VARS)"
-    if [ -f "$pj_commands" ]; then
-      print_help $pj_commands
-      exit
-    fi
+  if [[ "$0" == *help ]] && [[ -z "$1" ]]; then
+      pj_commands="$(pj commands $@ --fullpath)"
+      if [ -f "$pj_commands" ]; then
+        print_help $pj_commands
+        exit
+      fi
+  fi
+
+  if [[ "$0" == *help ]] && [[ ! -z "$1" ]]; then
+     pj_commands="$(pj commands $@ --fullpath)"
   fi
 
   for command in ${pj_commands[@]}; do
-    local file="$(command_path "$command")"
+    if [ -d $command ]; then
+      
+      local file="$command/${command##*/}"
+    else
+      
+      local file="$command"
+    fi
+    
+    # local file="$(command_path "$command")"
+
     if [ ! -h "$file" ] && [ -f "$file" ]; then
       local summary="$(summary "$file")"
       if [ -n "$summary" ]; then
 
-        if [ -d "$_SUB_COMMAND_ROOT/pj-$command" ]; then
-          commands["${#commands[@]}"]="-> $command"
-        else
-          commands["${#commands[@]}"]="-> $command"
+        command=$(basename $command)
+        command=${command##pj-}
+
+        if [ "$whoa" != "true" ]; then
+          if [ -d "$_SUB_COMMAND_ROOT/pj-$command" ]; then
+            commands["${#commands[@]}"]="-> $command"
+          else
+            commands["${#commands[@]}"]="-> $command"
+          fi
         fi
 
         summaries["${#summaries[@]}"]="$summary"
@@ -44,30 +62,53 @@ print_summaries() {
 
   for (( index=0; index < ${#commands[@]}; index++ )); do
     printf "   %-${longest_command}s  %s\n" "${commands[$index]}" \
-      "$(truncate "$summary_length" "${summaries[$index]}")"
+      "( $(truncate "$summary_length" "${summaries[$index]}") )"
   done
 }
 
 print_help() {
-  local file="$1"
+  local file="$_SUB_COMMAND_HELP_DIR/$1"
+
+  if [ ! -f $file ]; then
+    local file="$1"
+  fi
+
   local usage="$(usage "$file")"
 
   if [ -n "$usage" ]; then
-    echo "$usage"
+    echo
+    echo "      $usage"
 
     local help="$(help "$file")"
-    [ -n "$help" ] && echo && echo "$help"
+    [ -n "$help" ] && echo && echo "      ($help)"
+    echo
   else
     echo "Sorry, this command isn't documented yet."
   fi
 }
 
 command_path() {
-  pj_path="$(command -v "pj-$command" || command -v "pj-sh-$command" || true)"
-  if [ "$pj_path" == "" ] && [ -f "$_SUB_COMMAND_ROOT/pj-$command/pj-$command" ]; then
-    echo "$_SUB_COMMAND_ROOT/pj-$command/pj-$command"
+
+  if [ "$_SUB_COMMAND_HELP_DIR_ONLY" == "true" ]; then
+
+      echo "$_SUB_COMMAND_HELP_DIR"
+
   else
-    echo "$pj_path"
+
+    if [ -f "$_SUB_COMMAND_HELP" ]; then
+      
+      echo "$_SUB_COMMAND_HELP"
+
+    else
+
+      pj_path="$(command -v "pj-$command" || command -v "pj-sh-$command" || true)"
+      if [ "$pj_path" == "" ] && [ -f "$_SUB_COMMAND_ROOT/pj-$command/pj-$command" ]; then
+        echo "$_SUB_COMMAND_ROOT/pj-$command/pj-$command"
+      else
+        echo "$pj_path"
+      fi
+
+    fi
   fi
 }
 
@@ -100,20 +141,20 @@ print_command_help() {
   local usage="$(usage "$file")"
 
   if [ -n "$usage" ]; then
-    echo "$usage"
+    echo
+    echo "      $usage"
 
     local help="$(help "$file")"
-    [ -n "$help" ] && echo && echo "$help"
+    [ -n "$help" ] && echo && echo "      $help"
 
-    local _SUB_SUMMARY="$(print_summaries)"
+    local _SUB_SUMMARY="$(print_summaries $@)"
 
     if [ ! "$_SUB_SUMMARY" == "" ]; then
-      echo "
-Some useful pj $command commands are:
+      
+      echo
+      echo "      ("$(summary $file)")"
+      echo
 
-$(print_summaries)
-
-See 'pj $_SUB_COMMAND_VARS [command]' for information on a specific command."
     fi
   else
     echo "Sorry, this command isn't documented yet."
@@ -126,24 +167,61 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
-command="$_SUB_COMMAND_FILE"
-if [[ "$command" == "help" || "$command" == "" ]] && [[ ! "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE ]]; then
 
-  if [[ "$command" == "help" ]]; then
+if [ "$_SUB_COMMAND_JUST_HELP" == "true" ]; then
 
-    echo "
-    Usage: pj help [commannd] [<args>]
+          echo "
+      Usage: pj [commannd] [<args>]
 
-    Some useful pj commands are:
+      Some useful pj commands are:
 
 $(print_summaries)
 
-    See 'pj help [command]' for information on a specific command.
+      See 'pj help [command]' for information on a specific command.
 "
 
-  else
+exit
 
-    if [[ "$command" == "" ]]; then
+fi
+
+
+if [ "$_SUB_COMMAND_HELP_DIR_ONLY" == "true" ]; then
+
+ echo "
+      Usage: pj $@ [<command>]
+
+      Some useful pj $@ commands are:
+
+$(print_summaries $@)
+
+      See 'pj help [command]' for information on a specific command.
+"
+
+  exit
+
+fi
+
+if [ -d "$_SUB_COMMAND_HELP" ]; then
+
+  print_help "$_SUB_COMMAND_HELP"
+
+  exit
+
+elif [ -f "$_SUB_COMMAND_HELP" ]; then
+
+  print_command_help "$_SUB_COMMAND_HELP"
+
+  exit
+
+fi
+
+exit
+
+command="$_SUB_COMMAND_FILE"
+
+if [[ "$command" == "" ]] && [[ ! "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE ]]; then
+
+    if [[ "$command" == "" ]] || [[ "$command" == "pj-help" ]]; then
 
       echo "
       Usage: pj [commannd] [<args>]
@@ -154,9 +232,7 @@ $(print_summaries)
 
       See 'pj help [command]' for information on a specific command.
 "
-
     else
-
       echo "
       Usage: pj $command [<args>]
 
@@ -168,12 +244,12 @@ $(print_summaries)
 "
     fi
 
-  fi
-
 else
 
-  file="$(command_path "$command")"
 
+  exit
+
+  file="$(command_path "$command")"
   if [ -n "$file" ]; then
     if [[ "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE ]]; then
       print_command_help "$file"

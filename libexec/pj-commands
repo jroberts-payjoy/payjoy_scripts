@@ -6,6 +6,29 @@
 
 set -e
 
+vars=($@)
+
+for (( i=0; i < ${#vars[@]}; i++ )); do
+
+  if [ "${vars[$i]}" == "--fullpath" ]; then
+
+    export _SUB_FULL="true"
+
+  fi
+
+done
+
+if [ ! -z "$1" ] && [ -f $1 ]; then
+
+  if [[ "$(basename $1)" != "$1" ]]; then
+
+    name=$(dirname $1)
+    export _SUB_COMMAND_HELP_DIR=$name
+
+  fi
+
+fi
+
 if [ "$1" = "--sh" ]; then
   sh=1
   shift
@@ -16,43 +39,71 @@ fi
 
 shopt -s nullglob
 
-if grep -i "^# provide pj completions" "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" >/dev/null; then
-  completions=`exec "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" --complete "$@"`
-  if [ "$completions" ]; then
-    echo $completions
+if [ -f "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" ]; then
+
+  if grep -i "^# provide pj completions" "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" >/dev/null; then
+    completions=`exec "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" --complete "$@"`
+    if [ "$completions" ]; then
+      echo $completions
+    fi
+    exit
   fi
-  exit
+
+else
+
+  if grep -i "^# provide pj completions" "$_SUB_COMMAND_ROOT/$_SUB_COMMAND_FILE" >/dev/null; then
+    completions=`exec "$_SUB_COMMAND_ROOT/$_SUB_COMMAND_FILE" --complete "$@"`
+    if [ "$completions" ]; then
+      echo $completions
+    fi
+    exit
+  fi
+
 fi
 
-{ for path in ${PATH//:/$'\n'}; do
-    for command in "${path}/pj-"*; do
-      if [ ! "$command" == "$_SUB_COMMAND_ROOT/pj-$_SUB_COMMAND_FILE" ] || [ "$_SUB_COMMAND_FILE" == "commands" ]; then
-        if [ -d "$_SUB_COMMAND_ROOT" ] && [ "$_SUB_COMMAND_ROOT" == "$path" ]; then
-          do_commands="true"
-        elif [ ! -d "$_SUB_COMMAND_ROOT" ] || [ "$_SUB_COMMAND_ROOT" == "$_PJ_ROOT/libexec" ]; then
-          do_commands="true"
+{ 
+  for path in ${_SUB_COMMAND_HELP_DIR//:/$'\n'}; do
+    for command in "$path/pj-*"; do
+
+      a=($command)
+
+      for i in "${a[@]}"
+      do
+
+        if [ ! -z $1 ] && [ -f $1 ]; then
+          d=$(basename $1)
         else
-          do_commands="false"
+          d="sdafagsdg"
         fi
-      elif [ "$command" == "commands" ] && [ "$command" == "$_SUB_COMMAND_FILE" ]; then
-        do_commands="true"
-      else
-        do_commands="false"
-      fi
-       if [ "$do_commands" == "true" ]; then
-        command="${command##*pj-}"
-        if [ -n "$sh" ]; then
-          if [ ${command:0:3} = "sh-" ]; then
-            echo ${command##sh-}
-          fi
-        elif [ -n "$nosh" ]; then
-          if [ ${command:0:3} != "sh-" ]; then
-            echo ${command##sh-}
-          fi
+
+        if [ -f $i ]; then
+          e=$(basename $i)
+          f=$(basename $(dirname $i))
         else
-          echo ${command##sh-}
+          e="agdrgag"
+          f="adfrtsh"
         fi
-      fi
+
+        if [ "$e" == "$f" ]; then
+          continue
+        fi
+
+        c=$(basename $i)
+
+        if [ "$c" != "pj-$1" ] && [ "$c" != "$d" ]; then
+          b=${c##pj-}
+
+          if [ "$_SUB_FULL" == "true" ] && [ "$c" != "$0" ]; then
+
+            echo $i
+          else
+
+            echo $b
+          fi
+        fi
+      
+      done
+      
     done
   done
 } | sort | uniq

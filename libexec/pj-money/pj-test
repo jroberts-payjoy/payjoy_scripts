@@ -2,3 +2,5 @@
 # Usage: pj 
 # Summary: SUMMARY_PLACE_HOLDER
 # Help: HELP_PLACE_HOLDER
+
+echo "hello world"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Usage: pj scripts create
-# Summary: This script is called by the root script to autoupdate the local pj script repository
-# Help: Do not use this script manually
+# Usage: pj scripts create [command group] <command>
+# Summary: Create a new pj command
+# Help: Create a new pj command by specifying one+ command groups and command name
 
 set -e
 
