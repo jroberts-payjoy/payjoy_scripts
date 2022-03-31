@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: pj money
+# Usage: pj money [money_command]
 # Summary: The money team scripts directory root script
 # Help: List the money team scripts
 
