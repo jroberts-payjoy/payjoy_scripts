@@ -176,6 +176,14 @@ print_command_help() {
   fi
 }
 
+banner() {
+
+  echo
+  echo "${_CYAN}      PayJoy Command Line Scripts${_RESET}"
+  echo
+
+}
+
 # Provide pj completions
 if [ "$1" = "--complete" ]; then
   echo "$(pj commands)"
@@ -183,10 +191,12 @@ if [ "$1" = "--complete" ]; then
 fi
 
 
+header="$(banner)"
+
 if [ "$_SUB_COMMAND_JUST_HELP" == "true" ]; then
 
           echo "
-      ${_YELLOW}Usage${_RESET}: ${_MAGENTA}pj [commannd] [<args>]${_RESET}
+      $header
 
 
 $(print_summaries)
@@ -205,7 +215,7 @@ if [ "$_SUB_COMMAND_HELP_DIR_ONLY" == "true" ]; then
 
  echo "
 
-      ${_YELLOW}Usage${_RESET}: ${_MAGENTA}pj $@ [<command>]${_RESET}
+      $header
 
 
 $(print_summaries $@)
@@ -243,7 +253,7 @@ if [[ "$command" == "" ]] && [[ ! "$_SUB_COMMAND_ROOT" == *pj-$_SUB_COMMAND_FILE
 
       echo "
 
-      ${_YELLOW}Usage${_RESET}: ${_MAGENTA}pj [commannd] [<args>]${_RESET}
+      $header
 
 
 $(print_summaries)
@@ -256,7 +266,7 @@ $(print_summaries)
     else
       echo "
 
-      ${_YELLOW}Usage${_RESET}: ${_MAGENTA}pj $command [<args>]${_RESET}
+      $header
 
 
 $(print_summaries)
