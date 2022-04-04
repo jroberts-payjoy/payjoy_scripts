@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Usage: pj push
+# Summary: This script will push any changes commited to the current branch
+# Help: This script will push any changes commited to the current branch
+
+set -e
+
+# get current branch 
+branch=`git symbolic-ref -q HEAD`
+
+git push origin $branch
