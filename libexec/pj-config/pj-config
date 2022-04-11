@@ -1,6 +1,6 @@
 #!/usr/bin/env php
-# Usage: pj config [<var>]
-# Summary: Accesses config variables
-# Help: HELP_PLACE_HOLDER
+# Usage: pj config get [<var>]
+# Summary: Retrieve configurable variables from conf/config.yaml
+# Help: Use this command to retrieve configurable variables in conf/config.yaml
 
-pj help config
+pj help config get

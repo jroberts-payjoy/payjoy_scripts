@@ -12,6 +12,8 @@ set -e
 
 shift
 
+export SCRIPT_DIR="$SCRIPT_DIR/.."
+
 cd $SCRIPT_DIR
 
 if [ "$#" -lt 1 ]; then

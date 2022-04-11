@@ -1,4 +1,9 @@
-#!/usr/bin/env bash
-# Usage: pj 
-# Summary: SUMMARY_PLACE_HOLDER
-# Help: HELP_PLACE_HOLDER
+#!/usr/bin/env php
+<?php
+# Usage: pj example basic php
+# Summary: Basic example of a PHP script in Sub
+# Help: Use this command to see a php example
+
+$a["test"] = "Example";
+
+print_r($a);
