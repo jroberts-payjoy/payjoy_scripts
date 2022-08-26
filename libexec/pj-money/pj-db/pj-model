@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Usage: pj money db model [ table_name ] [ TableName ]
+# Summary: Generate a Doctrine Model for the monolith
+# Help: Create a Model for the [ table_name ], provide [ TableName ] for convention corrections
+
+www="$_PJ_ROOT/../payjoy_www/"
+
+cd $www
+
+docker-compose exec -T backend bash << EOF
+php -d memory_limit=-1 /var/www/libs/vendor/doctrine/orm/bin/doctrine.php orm:convert-mapping yml /var/www/config/yaml/ --from-database --filter=$3  -vvv
+mv /var/www/config/yaml/$3.dcm.yml /var/www/config/yaml/$4.dcm.yml
+php -d memory_limit=-1 /var/www/libs/vendor/doctrine/orm/bin/doctrine.php orm:generate:entities --filter=$4 /var/www/src
+EOF

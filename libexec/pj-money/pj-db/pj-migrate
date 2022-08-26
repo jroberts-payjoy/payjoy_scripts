@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Usage: pj money db migrate
+# Summary: Run Phinx migrations
+# Help: Execute the Phinx migrations within the docker container
+
+www="$_PJ_ROOT/../payjoy_www/"
+
+cd $www
+
+docker-compose exec -T backend bash << EOF
+cd /var/www
+./libs/vendor/robmorgan/phinx/bin/phinx migrate
+EOF

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Usage: pj money db schema [ table_name ]
+# Summary: Generate a Phinx Migration for the monolith
+# Help: Create a blank phinx migration for the [ table_name ] specified
+
+www="$_PJ_ROOT/../payjoy_www/"
+
+cd $www
+
+docker-compose exec -T backend bash << EOF
+cd /var/www/db
+./phinx-create-migration.sh Create$3
+EOF
