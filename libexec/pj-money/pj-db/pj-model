@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: pj money db model [ table_name ] [ TableName ]
+# Usage: pj money db model [ TableName ] [ Tablename ]
 # Summary: Generate a Doctrine Model for the monolith
 # Help: Create a Model for the [ table_name ], provide [ TableName ] for convention corrections
 
@@ -7,8 +7,19 @@ www="$_PJ_ROOT/../payjoy_www/"
 
 cd $www
 
+a="$3"
+fname=${a:0:$((${#a}-1))}
+
 docker-compose exec -T backend bash << EOF
-php -d memory_limit=-1 /var/www/libs/vendor/doctrine/orm/bin/doctrine.php orm:convert-mapping yml /var/www/config/yaml/ --from-database --filter=$3  -vvv
-mv /var/www/config/yaml/$3.dcm.yml /var/www/config/yaml/$4.dcm.yml
-php -d memory_limit=-1 /var/www/libs/vendor/doctrine/orm/bin/doctrine.php orm:generate:entities --filter=$4 /var/www/src
+cd /var/www
+rm -rf /var/www/config/yaml/$4.dcm.yml
+rm -rf /var/www/config/yaml/$3.dcm.yml
+rm -rf /var/www/config/yaml/$fname.dcm.yml
+php -d memory_limit=-1 /var/www/libs/vendor/doctrine/orm/bin/doctrine.php orm:convert-mapping yml /var/www/config/yaml/ --from-database --filter=$4  -vvv
+mv /var/www/config/yaml/$4.dcm.yml /var/www/config/yaml/$3.dcm.yml.bak
+mv /var/www/config/yaml/$3.dcm.yml.bak /var/www/config/yaml/$3.dcm.yml
+cd /var/www/db
+php yaml-camel-fixer.php $3
+mv /var/www/config/yaml/$3.dcm.yml /var/www/config/yaml/$fname.dcm.yml
+php -d memory_limit=-1 /var/www/libs/vendor/doctrine/orm/bin/doctrine.php orm:generate:entities --filter=$fname /var/www/src
 EOF
